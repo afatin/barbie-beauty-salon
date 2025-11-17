@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 public class TokenExtractor {
 
     public String extractToken(HttpServletRequest request) {
-        // ТА ЖЕ ЛОГИКА, что в getTokenFromRequest()
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
                 if ("jwt".equals(cookie.getName())) {

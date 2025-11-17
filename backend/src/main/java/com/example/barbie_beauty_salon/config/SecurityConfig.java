@@ -45,10 +45,23 @@ public class SecurityConfig {
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .logout(logout -> logout.disable())
                 .authorizeHttpRequests(auth -> auth
+                        // Публичные эндпоинты (без токена)
                         .requestMatchers(
-                                "/api/auth/**"
+                                "/",
+                                "/api/auth/register",
+                                "/api/auth/login"
                         ).permitAll()
-                        .anyRequest().authenticated()
+
+                        // RBAC: строгий контроль по ролям
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/masters/**").hasRole("MASTER")
+                        .requestMatchers("/api/clients/**").hasRole("CLIENT")
+
+                        // Публичный каталог (только чтение)
+                        .requestMatchers("/api/catalog/**").permitAll()
+
+                        // Всё остальное — запрещено
+                        .anyRequest().denyAll()
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 

@@ -65,17 +65,15 @@ public class BeautyServiceService {
     }
 
     @Transactional
-    public Optional<BeautyServiceDTO> updateBeautyService(Long beautyServiceId, Map<String, Object> updates) {
-        return beautyServiceRepository.findById(beautyServiceId)
+    public BeautyServiceDTO updateBeautyServiceFromAdmin(Long id, BeautyService updates) {
+        return beautyServiceRepository.findById(id)
                 .map(existing -> {
-                    if (updates.containsKey("name"))
-                        existing.setName((String) updates.get("name"));
-                    if (updates.containsKey("price"))
-                        existing.setPrice((Double) updates.get("price"));
-                    if (updates.containsKey("description"))
-                        existing.setDescription((String) updates.get("description"));
+                    if (updates.getName() != null) existing.setName(updates.getName());
+                    if (updates.getPrice() != null) existing.setPrice(updates.getPrice());
+                    if (updates.getDescription() != null) existing.setDescription(updates.getDescription());
                     return dtoConverter.convertToBeautyServiceDTO(beautyServiceRepository.save(existing));
-                });
+                })
+                .orElseThrow(() -> new EntityNotFoundException("Beauty service not found"));
     }
 
     @Transactional
